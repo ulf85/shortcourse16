@@ -6,9 +6,9 @@ output: html_document
 ---
 
 1. Use again the `daxreturns` data set from the package. Select at least 5 columns as your exercise data set. Fit a
-* R-vine with only Gaussian copulas
-* R-vine with arbitrary bivariate copula families
-* C-vine with arbitrary bivariate copula families
+  * R-vine with only Gaussian copulas
+  * R-vine with arbitrary bivariate copula families
+  * C-vine with arbitrary bivariate copula families
 
 2. Calculate the log-likelihood, AIC and BIC of each of the models
 3. Compare the models with the Vuong test
