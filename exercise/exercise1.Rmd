@@ -7,6 +7,7 @@ output: html_document
 
 Load from the package the `daxreturns` data set. Select the data for the
 companies Deutsche Bank (DBK.DE), BMW (BMW.DE), Allianz (ALV.DE) and Munich Re (MUV2.DE)
+Hint: `data(daxreturns)`
 
 1. Prepare an explanatory data analysis
 * Are the stock returns correlated?

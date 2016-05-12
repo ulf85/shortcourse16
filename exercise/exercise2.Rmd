@@ -1,0 +1,23 @@
+---
+title: "Exercise II"
+author: "Ulf Schepsmeier"
+date: "12 Mai 2016"
+output: html_document
+---
+
+1. Write down (on a paper) the R-vine tree sequence given the following R-Vine Matrix:
+$$
+\begin{pmatrix}
+ 6 \\
+ 2 & 5 \\
+ 3 & 2 & 4 \\
+ 4 & 3 & 2 & 3 \\
+ 1 & 4 & 3 & 2 & 2 \\
+ 5 & 1 & 1 & 1 & 1 & 1\\
+ \end{pmatrix}
+$$
+2. Check your results by plotting the R-vine with `plot()` or `RVineTreePlot()`. Therefore create an R-Vine Matrix object (RVM). For simplicity use only Gaussian copulas with random correlation parameter rho.  
+
+You may use the function `RVineMatrixCheck` to validate your R-vine matrix.
+See `?RvineMatrixCheck` for help.
+
