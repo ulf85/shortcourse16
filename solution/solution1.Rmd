@@ -1,0 +1,120 @@
+---
+title: "Solution I"
+author: "Ulf Schepsmeier"
+date: "12 Mai 2016"
+output: html_document
+---
+
+Load the package if not yet loaded.
+```{r}
+library(VineCopula)
+```
+
+Load the data set from the package and select the columns of interest.
+```{r}
+# Load data
+data(daxreturns)
+
+# select columns
+colnames(daxreturns)
+select <- c(1,4,6,11)
+dat <- daxreturns[,select]
+dat <- as.copuladata(dat)
+```
+
+You can see most of the data properties in one plot!
+The `pairs()` command plot contour plots (shape, tail dependence), 
+histogramms (are the data uniform distributed),
+and estimates Kendall's tau.
+```{r}
+pairs(dat)
+```
+
+
+If you want to do it in separate functions...
+```{r}
+# Kendall's tau
+cor(dat, method = "kendall")
+
+# contour plots
+BiCopMetaContour(u1=dat[,1], u2=dat[,2])
+BiCopMetaContour(u1=dat[,1], u2=dat[,3])
+BiCopMetaContour(u1=dat[,1], u2=dat[,4])
+
+BiCopMetaContour(u1=dat[,2], u2=dat[,3])
+BiCopMetaContour(u1=dat[,2], u2=dat[,4])
+BiCopMetaContour(u1=dat[,3], u2=dat[,4])
+```
+
+A nicer empirical contour plot can be achieved by using better kernal density estimators.
+There is one in the package `kdecopula`.
+```{r, eval=FALSE}
+# nicer with kdecopula
+library(kdecopula)
+fit <- kdecop(dat[,1:2])
+contour(fit)
+```
+
+Another graphical function is the `BiCopLambda()` function. Each copula has its characteristic shape.
+```{r}
+cop <- BiCop(family=3, par=BiCopTau2Par(family=3,
+                                        tau = cor(dat[,1:2], method="kendall")[1,2]))
+op <- par(mfrow = c(1, 3))
+BiCopLambda(u1=dat[,1], u2=dat[,2])  # empirical lambda-function
+BiCopLambda(cop)	# theoretical lambda-function
+BiCopLambda(u1=dat[, 1], u2=dat[, 2], cop)	# both
+par(op)
+```
+
+**suggestions for the pairs:**
+
+ALV-BMW: Clayton or survival Gumbel  
+
+ALV-DBK: Student's t-copula  
+
+ALV-MUV2: Student's t-copula  
+
+BMW-DBK: t or a BB-copula (there may be asymmetric tails)  
+
+BMW-MUV2: t or a BB-copula (there may be asymmetric tails) 
+
+DBK-MUV2: t  
+
+
+If we use the Akaike Information Criterion as comparison measure we get
+```{r, cache=TRUE}
+BiCopSelect(u1=dat[,1], u2=dat[,2])
+BiCopSelect(u1=dat[,1], u2=dat[,3])
+BiCopSelect(u1=dat[,1], u2=dat[,4])
+BiCopSelect(u1=dat[,2], u2=dat[,3])
+BiCopSelect(u1=dat[,2], u2=dat[,4])
+BiCopSelect(u1=dat[,3], u2=dat[,4])
+```
+
+With BIC we get a similar picture ...
+```{r}
+BiCopSelect(u1=dat[,1], u2=dat[,2], selectioncrit="BIC")
+```
+We can also do some goodness-of-fit tests.
+```{r}
+BiCopGofTest(u1=dat[,1], u2=dat[,2], family = 3, B=0)
+```
+
+The p-value is smaller than 0.05. Thus the copula does not fit the data good enough.
+
+The rotated Gumbel copula is better...
+```{r}
+BiCopGofTest(u1=dat[,1], u2=dat[,2], family = 14)
+```
+
+Beside the White GOF test we can use the gof test based on Kendall's transformation function.
+```{r, cache=TRUE}
+BiCopGofTest(u1=dat[,1], u2=dat[,2], family = 3, method = "kendall") # p-value = 0
+BiCopGofTest(u1=dat[,1], u2=dat[,2], family = 14, method = "kendall") # p-value > 0.05
+```
+
+Another goodness-of-fit is one based on scores 
+```{r, eval=FALSE}
+BiCopVuongClarke(u1=dat[,1], u2=dat[,2], familyset = c(1:10, 13,14,16:20,104,204,114,214))
+```
+

@@ -1,0 +1,55 @@
+---
+title: "Solution II"
+author: "Ulf Schepsmeier"
+date: "16 Mai 2016"
+output: html_document
+---
+
+Load the package if not yet loaded.
+```{r}
+library(VineCopula)
+```
+
+Transform the given R-vine matrix to an R object.
+As copula families we use for simplicity the Gaussian copula.
+The parameter matrix could be empty. We use as parameter 0.5 here.
+```{r}
+# Matrix for R-vine structure
+Matrix <- matrix(c(6,0,0,0,0,0,
+                   2,5,0,0,0,0,
+                   3,2,4,0,0,0,
+                   4,3,2,3,0,0,
+                   1,4,3,2,2,0,
+                   5,1,1,1,1,1),
+                 nrow=6, ncol=6,
+                 byrow = TRUE)
+Matrix
+
+family <- matrix(1, nrow=6, ncol=6)
+par <- matrix(0.5, nrow=6, ncol=6)
+par2 <- matrix(0,nrow=6, ncol=6)
+```
+
+Make an R-vine Matrix object
+```{r}
+RVM <- RVineMatrix(Matrix=Matrix, family=family, par=par, par2=par2)
+```
+
+Validate the R-vine matrix
+```{r}
+RVineMatrixCheck(Matrix)
+```
+
+Check the RVM object graphically.
+```{r}
+plot(RVM)
+```
+
+```{r, eval=FALSE}
+# with families
+plot(RVM, edge.labels = "family")
+
+# with Kendall's tau
+plot(RVM, edge.labels = "tau")
+```
+

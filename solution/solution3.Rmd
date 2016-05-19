@@ -1,0 +1,96 @@
+---
+title: "Solution III"
+author: "Ulf Schepsmeier"
+date: "16 Mai 2016"
+output: html_document
+---
+
+Load the package if not yet loaded.
+```{r}
+library(VineCopula)
+```
+
+Get some data from the package. I selected here the first 6 stock returns.
+```{r data}
+data("daxreturns")
+dat <- daxreturns[,1:6]
+```
+
+### Model selection
+
+Fit an R-vine with only Gaussian copulas
+```{r Gauss, cache=TRUE}
+RVMgauss <- RVineStructureSelect(data = dat, familyset=1, type="RVine")
+
+summary(RVMgauss)
+```
+
+Fit an R-vine with arbitrary copula families
+```{r RVine, cache=TRUE}
+RVM <- RVineStructureSelect(data=dat)
+summary(RVM)
+```
+
+We can do it also in parallel.
+```{r parallel, eval=FALSE}
+RVM2 <- RVineStructureSelect(data=dat, cores=4)
+```
+
+And finally a C-vine:
+```{r Cvine, cache=TRUE}
+RVMcvine <- RVineStructureSelect(data=dat, type="CVine")
+
+summary(RVMcvine)
+```
+
+### Model comparison based on log-likelihood, AIC and BIC
+
+Summary of the log-lik, AIC, BIC. Make it nice in a table.
+```{r}
+tab <- data.frame(names=c("Gauss", "R-Vine", "C-Vine"),
+                  loglik=c(RVMgauss$logLik, RVM$logLik, RVMcvine$logLik),
+                  AIC=c(RVMgauss$AIC, RVM$AIC, RVMcvine$AIC),
+                  BIC=c(RVMgauss$BIC, RVM$BIC, RVMcvine$BIC))
+tab
+```
+
+
+### Model comparison based on Vuong Test
+
+```{r}
+RVineVuongTest(data=dat, RVM1=RVMgauss, RVM2=RVM)
+```
+Test statistic is negativ => second model is better  
+p-value smaller than 0.05 => significant
+
+```{r}
+RVineVuongTest(data=dat, RVM1=RVMgauss, RVM2=RVMcvine)
+# C-vine > Gauss
+
+RVineVuongTest(data=dat, RVM1=RVM, RVM2=RVMcvine)
+# R-vine > C-vine
+```
+
+### Model improvment via MLE
+
+```{r MLE, eval=FALSE}
+RVMmle <- RVineMLE(data=dat, RVM=RVM)
+RVM$loglik
+RVMmle$loglik
+# Yes a little bit
+```
+
+### Truncation
+
+```{r truncation, cache=TRUE}
+RVMtrunc <- RVineStructureSelect(data=dat, trunclevel = 2)
+RVMtrunc$AIC
+RVM$AIC
+# Gap of 100 AIC points
+
+RVMtrunc2 <- RVineStructureSelect(data=dat, trunclevel = 3)
+RVMtrunc2$AIC
+RVM$AIC
+# Gap of 30 AIC points => OK
+```
+
